@@ -29,6 +29,7 @@ target_include_directories(yeastcppwpilibdrivecontroller PUBLIC
     /usr/local/include/eigen3
     /usr/local/include/wpiutil
     /usr/local/include/wpimath
+    ${ADDITIONAL_INCLUDE_PATHS}
 )
 
 # Install the library and header files
