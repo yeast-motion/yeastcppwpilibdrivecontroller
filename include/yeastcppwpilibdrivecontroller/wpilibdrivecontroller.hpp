@@ -18,6 +18,7 @@ namespace yeast_motion
         private:
             std::vector<SwerveModuleConfig> module_configs;
             std::vector<SwerveModuleStatus> module_statuses;
+            std::vector<SwerveModuleCommand> module_commands;
             std::unique_ptr<frc::SwerveDriveKinematics<4>> kinematics;
     };
 }

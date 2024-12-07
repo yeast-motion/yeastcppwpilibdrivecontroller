@@ -35,6 +35,12 @@ WPILibDriveController::WPILibDriveController(nlohmann::json characterization)
         m_frontRightLocation, 
         m_backLeftLocation,
         m_backRightLocation));
+
+    for (size_t i = 0; i < 4; i++)
+    {
+        SwerveModuleCommand command;
+        module_commands.push_back(command);
+    }
 }
 
 MotionState WPILibDriveController::drive(MotionCommand command)
@@ -58,12 +64,18 @@ MotionState WPILibDriveController::drive(MotionCommand command)
     optimized_modules.push_back(frc::SwerveModuleState::Optimize(br, units::radian_t(module_statuses[3].theta)));
 
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html#cosine-compensation
-    optimized_modules[0].speed *= (optimized_modules[0].angle - units::radian_t(module_statuses[0].theta)).Cos();
-    optimized_modules[1].speed *= (optimized_modules[1].angle - units::radian_t(module_statuses[1].theta)).Cos();
-    optimized_modules[2].speed *= (optimized_modules[2].angle - units::radian_t(module_statuses[2].theta)).Cos();
-    optimized_modules[3].speed *= (optimized_modules[3].angle - units::radian_t(module_statuses[3].theta)).Cos();
+    optimized_modules[0].CosineScale(units::radian_t(module_statuses[0].theta));
+    optimized_modules[1].CosineScale(units::radian_t(module_statuses[1].theta));
+    optimized_modules[2].CosineScale(units::radian_t(module_statuses[2].theta));
+    optimized_modules[3].CosineScale(units::radian_t(module_statuses[3].theta));
 
-
-
+    module_commands[0].speed = optimized_modules[0].speed.value();
+    module_commands[0].theta = optimized_modules[0].angle.Radians().value();
+    module_commands[1].speed = optimized_modules[1].speed.value();
+    module_commands[1].theta = optimized_modules[1].angle.Radians().value();
+    module_commands[2].speed = optimized_modules[2].speed.value();
+    module_commands[2].theta = optimized_modules[2].angle.Radians().value();
+    module_commands[3].speed = optimized_modules[3].speed.value();
+    module_commands[3].theta = optimized_modules[3].angle.Radians().value();
     
 }
