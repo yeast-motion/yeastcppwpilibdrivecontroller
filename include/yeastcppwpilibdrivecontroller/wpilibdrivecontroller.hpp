@@ -3,9 +3,9 @@
 #include <iostream>
 #include <vector>
 
-#include <yeastcpp.hpp>
+#include "yeastcpp/yeastcpp.hpp"
 
-#include <wpimath/frc/kinematics/SwerveDriveKinematics.h>
+#include <frc/kinematics/SwerveDriveKinematics.h>
 
 namespace yeast_motion
 {
