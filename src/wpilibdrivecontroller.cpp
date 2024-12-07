@@ -19,16 +19,17 @@ WPILibDriveController::WPILibDriveController(nlohmann::json characterization)
 {
     // Need to load characterizations, incl swerve modules
 
-    if (modules.size() != 4)
+    if (module_statuses.size() != 4)
     {
         throw std::runtime_error("Only configurations with 4 swerve modules are supported by the Yeast WPI Lib Drive Controller");
     }
 
-    frc::Translation2d m_frontLeftLocation  {units::meter_t(modules[0].translation.x), units::meter_t(modules[0].translation.y)};
-    frc::Translation2d m_frontRightLocation {units::meter_t(modules[1].translation.x), units::meter_t(modules[1].translation.y)};
-    frc::Translation2d m_backLeftLocation   {units::meter_t(modules[2].translation.x), units::meter_t(modules[2].translation.y)};
-    frc::Translation2d m_backRightLocation  {units::meter_t(modules[3].translation.x), units::meter_t(modules[3].translation.y)};
+    frc::Translation2d m_frontLeftLocation  {units::meter_t(module_configs[0].translation.x), units::meter_t(module_configs[0].translation.y)};
+    frc::Translation2d m_frontRightLocation {units::meter_t(module_configs[1].translation.x), units::meter_t(module_configs[1].translation.y)};
+    frc::Translation2d m_backLeftLocation   {units::meter_t(module_configs[2].translation.x), units::meter_t(module_configs[2].translation.y)};
+    frc::Translation2d m_backRightLocation  {units::meter_t(module_configs[3].translation.x), units::meter_t(module_configs[3].translation.y)};
 
+    // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html#constructing-the-kinematics-object
     kinematics.reset(new frc::SwerveDriveKinematics<4> 
         (m_frontLeftLocation, 
         m_frontRightLocation, 
@@ -40,14 +41,29 @@ MotionState WPILibDriveController::drive(MotionCommand command)
 {
     MotionState result;
 
+    // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html#converting-chassis-speeds-to-module-states
     frc::ChassisSpeeds speeds
         (units::meters_per_second_t(command.velocity.x), 
          units::meters_per_second_t(command.velocity.y), 
          units::radians_per_second_t(command.velocity.omega));
          
     auto [fl, fr, bl, br] = kinematics->ToSwerveModuleStates(speeds);
+    
+    std::vector<frc::SwerveModuleState> optimized_modules;
 
-    auto flOptimized = frc::SwerveModuleState::Optimize(fl, units::radian_t(m_turningEncoder.GetDistance()));
+    // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html#module-angle-optimization
+    optimized_modules.push_back(frc::SwerveModuleState::Optimize(fl, units::radian_t(module_statuses[0].theta)));
+    optimized_modules.push_back(frc::SwerveModuleState::Optimize(fr, units::radian_t(module_statuses[1].theta)));
+    optimized_modules.push_back(frc::SwerveModuleState::Optimize(bl, units::radian_t(module_statuses[2].theta)));
+    optimized_modules.push_back(frc::SwerveModuleState::Optimize(br, units::radian_t(module_statuses[3].theta)));
+
+    // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html#cosine-compensation
+    optimized_modules[0].speed *= (optimized_modules[0].angle - units::radian_t(module_statuses[0].theta)).Cos();
+    optimized_modules[1].speed *= (optimized_modules[1].angle - units::radian_t(module_statuses[1].theta)).Cos();
+    optimized_modules[2].speed *= (optimized_modules[2].angle - units::radian_t(module_statuses[2].theta)).Cos();
+    optimized_modules[3].speed *= (optimized_modules[3].angle - units::radian_t(module_statuses[3].theta)).Cos();
+
+
 
     
 }

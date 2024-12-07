@@ -16,7 +16,8 @@ namespace yeast_motion
             WPILibDriveController(nlohmann::json characterization);
 
         private:
-            std::vector<SwerveModule> modules;
+            std::vector<SwerveModuleConfig> module_configs;
+            std::vector<SwerveModuleStatus> module_statuses;
             std::unique_ptr<frc::SwerveDriveKinematics<4>> kinematics;
     };
 }
