@@ -80,3 +80,15 @@ MotionState WPILibDriveController::drive(MotionCommand command)
     
     return result;
 }
+
+
+std::vector<SwerveModuleCommand> WPILibDriveController::get_command()
+{
+    return module_commands;
+}
+
+
+void WPILibDriveController::update_motor_status (std::vector<SwerveModuleStatus> motor_status)
+{
+    module_statuses = motor_status;
+}
