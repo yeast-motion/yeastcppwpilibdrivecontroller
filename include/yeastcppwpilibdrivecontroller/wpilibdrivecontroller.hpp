@@ -13,7 +13,7 @@
 
 namespace yeast_motion
 {
-    class WPILibDriveController : DriveController
+    class WPILibDriveController : public DriveController
     {
         public:
             MotionState drive(MotionCommand command);
