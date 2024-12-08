@@ -17,9 +17,15 @@ using namespace yeast_motion;
 
 WPILibDriveController::WPILibDriveController(nlohmann::json characterization)
 {
-    // Need to load characterizations, incl swerve modules
-
-    if (module_statuses.size() != 4)
+    for (auto motor_config : characterization["MotorConfig"])
+    {
+        SwerveModuleConfig config;
+        config.translation.x = motor_config["x"];
+        config.translation.y = motor_config["y"];
+        module_configs.push_back(config);
+    }
+    
+    if (module_configs.size() != 4)
     {
         throw std::runtime_error("Only configurations with 4 swerve modules are supported by the Yeast WPI Lib Drive Controller");
     }
