@@ -60,7 +60,21 @@ MotionState WPILibDriveController::drive(MotionCommand command)
          units::radians_per_second_t(command.velocity.omega));
          
     auto [fl, fr, bl, br] = kinematics->ToSwerveModuleStates(speeds);
-    
+
+    if (std::abs(speeds.vx.value()) <= 0.0001 &&
+        std::abs(speeds.vy.value()) <= 0.0001 &&
+        std::abs(speeds.omega.value()) <= 0.0001)
+    {
+        fl.speed = 0_mps;
+        fl.angle = units::radian_t(module_statuses[0].theta);
+        fr.speed = 0_mps;
+        fr.angle = units::radian_t(module_statuses[1].theta);
+        bl.speed = 0_mps;
+        bl.angle = units::radian_t(module_statuses[2].theta);
+        br.speed = 0_mps;
+        br.angle = units::radian_t(module_statuses[3].theta);
+    }
+
     std::vector<frc::SwerveModuleState> optimized_modules;
 
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html#module-angle-optimization
@@ -75,10 +89,10 @@ MotionState WPILibDriveController::drive(MotionCommand command)
     optimized_modules.push_back(br);
 
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html#cosine-compensation
-    // optimized_modules[0].CosineScale(units::radian_t(module_statuses[0].theta));
-    // optimized_modules[1].CosineScale(units::radian_t(module_statuses[1].theta));
-    // optimized_modules[2].CosineScale(units::radian_t(module_statuses[2].theta));
-    // optimized_modules[3].CosineScale(units::radian_t(module_statuses[3].theta));
+    optimized_modules[0].CosineScale(units::radian_t(module_statuses[0].theta));
+    optimized_modules[1].CosineScale(units::radian_t(module_statuses[1].theta));
+    optimized_modules[2].CosineScale(units::radian_t(module_statuses[2].theta));
+    optimized_modules[3].CosineScale(units::radian_t(module_statuses[3].theta));
 
     module_commands[0].speed = optimized_modules[0].speed.value();
     module_commands[0].theta = optimized_modules[0].angle.Radians().value();
