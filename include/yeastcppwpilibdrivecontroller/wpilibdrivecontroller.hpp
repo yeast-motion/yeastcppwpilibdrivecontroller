@@ -16,7 +16,7 @@ namespace yeast_motion
     class WPILibDriveController : public DriveController
     {
         public:
-            MotionState drive(MotionCommand command);
+            MotionSample drive(MotionCommand command);
             std::vector<SwerveModuleCommand> get_command();
             void update_motor_status (std::vector<SwerveModuleStatus> motor_status);
             WPILibDriveController(nlohmann::json characterization);

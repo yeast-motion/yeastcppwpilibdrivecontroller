@@ -49,10 +49,8 @@ WPILibDriveController::WPILibDriveController(nlohmann::json characterization)
     }
 }
 
-MotionState WPILibDriveController::drive(MotionCommand command)
+MotionSample WPILibDriveController::drive(MotionCommand command)
 {
-    MotionState result;
-
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html#converting-chassis-speeds-to-module-states
     frc::ChassisSpeeds speeds
         (units::meters_per_second_t(command.velocity.x), 
@@ -102,8 +100,15 @@ MotionState WPILibDriveController::drive(MotionCommand command)
     module_commands[2].theta = optimized_modules[2].angle.Radians().value();
     module_commands[3].speed = optimized_modules[3].speed.value();
     module_commands[3].theta = optimized_modules[3].angle.Radians().value();
+
+    MotionSample motion_ref;
+    motion_ref.pose_valid = false;
+    motion_ref.velocity = command.velocity;
+    motion_ref.velocity_valid = command.velocity_valid;
+    motion_ref.acceleration = command.acceleration;
+    motion_ref.acceleration_valid = command.acceleration_valid;
     
-    return result;
+    return motion_ref;
 }
 
 
