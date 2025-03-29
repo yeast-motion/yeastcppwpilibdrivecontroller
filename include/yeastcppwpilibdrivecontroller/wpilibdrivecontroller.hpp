@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <any>
 
 #include "yeastcpp/data_structures/swerve_module_command.hpp"
 #include "yeastcpp/data_structures/swerve_module_config.hpp"
@@ -9,7 +10,11 @@
 
 #include "yeastcpp/components/drive_controller.hpp"
 
-#include <frc/kinematics/SwerveDriveKinematics.h>
+namespace frc
+{
+    template <size_t NumModules>
+    class SwerveDriveKinematics;
+}
 
 namespace yeast_motion
 {
@@ -26,5 +31,5 @@ namespace yeast_motion
             std::vector<SwerveModuleStatus> module_statuses;
             std::vector<SwerveModuleCommand> module_commands;
             std::unique_ptr<frc::SwerveDriveKinematics<4>> kinematics;
-    };
+        };
 }

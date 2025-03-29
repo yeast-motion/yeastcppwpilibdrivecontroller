@@ -24,7 +24,7 @@ WPILibDriveController::WPILibDriveController(nlohmann::json characterization)
         config.translation.y = motor_config["y"];
         module_configs.push_back(config);
     }
-    
+
     if (module_configs.size() != 4)
     {
         throw std::runtime_error("Only configurations with 4 swerve modules are supported by the Yeast WPI Lib Drive Controller");
@@ -36,9 +36,9 @@ WPILibDriveController::WPILibDriveController(nlohmann::json characterization)
     frc::Translation2d m_backRightLocation  {units::meter_t(module_configs[3].translation.x), units::meter_t(module_configs[3].translation.y)};
 
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html#constructing-the-kinematics-object
-    kinematics.reset(new frc::SwerveDriveKinematics<4> 
-        (m_frontLeftLocation, 
-        m_frontRightLocation, 
+    kinematics.reset(new frc::SwerveDriveKinematics<4>
+        (m_frontLeftLocation,
+        m_frontRightLocation,
         m_backLeftLocation,
         m_backRightLocation));
 
@@ -53,10 +53,10 @@ MotionSample WPILibDriveController::drive(MotionCommand command)
 {
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html#converting-chassis-speeds-to-module-states
     frc::ChassisSpeeds speeds
-        (units::meters_per_second_t(command.velocity.x), 
-         units::meters_per_second_t(command.velocity.y), 
+        (units::meters_per_second_t(command.velocity.x),
+         units::meters_per_second_t(command.velocity.y),
          units::radians_per_second_t(command.velocity.omega));
-         
+
     auto [fl, fr, bl, br] = kinematics->ToSwerveModuleStates(speeds);
 
     if (std::abs(speeds.vx.value()) <= 0.0001 &&
@@ -107,7 +107,7 @@ MotionSample WPILibDriveController::drive(MotionCommand command)
     motion_ref.velocity_valid = command.velocity_valid;
     motion_ref.acceleration = command.acceleration;
     motion_ref.acceleration_valid = command.acceleration_valid;
-    
+
     return motion_ref;
 }
 
