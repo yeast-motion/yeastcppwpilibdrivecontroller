@@ -1,4 +1,5 @@
 #include <exception>
+#include <cmath>
 
 #include "yeastcppwpilibdrivecontroller/wpilibdrivecontroller.hpp"
 
@@ -92,14 +93,24 @@ MotionSample WPILibDriveController::drive(MotionCommand command)
     optimized_modules[2].CosineScale(units::radian_t(module_statuses[2].theta));
     optimized_modules[3].CosineScale(units::radian_t(module_statuses[3].theta));
 
+    float total_speed = std::sqrt(std::pow(speeds.vx.value(), 2) + std::pow(speeds.vy.value(), 2));
+    float total_acceleration = std::sqrt(std::pow(command.acceleration.x, 2) + std::pow(command.acceleration.y, 2));
+
     module_commands[0].speed = optimized_modules[0].speed.value();
     module_commands[0].theta = optimized_modules[0].angle.Radians().value();
+    module_commands[0].accel = (optimized_modules[0].speed.value() / total_speed) * total_acceleration;
+
     module_commands[1].speed = optimized_modules[1].speed.value();
     module_commands[1].theta = optimized_modules[1].angle.Radians().value();
+    module_commands[1].accel = (optimized_modules[1].speed.value() / total_speed) * total_acceleration;
+
     module_commands[2].speed = optimized_modules[2].speed.value();
     module_commands[2].theta = optimized_modules[2].angle.Radians().value();
+    module_commands[2].accel = (optimized_modules[2].speed.value() / total_speed) * total_acceleration;
+
     module_commands[3].speed = optimized_modules[3].speed.value();
     module_commands[3].theta = optimized_modules[3].angle.Radians().value();
+    module_commands[3].accel = (optimized_modules[3].speed.value() / total_speed) * total_acceleration;
 
     MotionSample motion_ref;
     motion_ref.pose_valid = false;
