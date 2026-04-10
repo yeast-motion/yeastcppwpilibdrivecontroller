@@ -95,22 +95,16 @@ MotionSample WPILibDriveController::drive(MotionCommand command)
 
     float total_speed = std::sqrt(std::pow(speeds.vx.value(), 2) + std::pow(speeds.vy.value(), 2));
     float total_acceleration = std::sqrt(std::pow(command.acceleration.x, 2) + std::pow(command.acceleration.y, 2));
+    bool has_translation = total_speed > 0.0001f;
 
-    module_commands[0].speed = optimized_modules[0].speed.value();
-    module_commands[0].theta = optimized_modules[0].angle.Radians().value();
-    module_commands[0].accel = (optimized_modules[0].speed.value() / total_speed) * total_acceleration;
-
-    module_commands[1].speed = optimized_modules[1].speed.value();
-    module_commands[1].theta = optimized_modules[1].angle.Radians().value();
-    module_commands[1].accel = (optimized_modules[1].speed.value() / total_speed) * total_acceleration;
-
-    module_commands[2].speed = optimized_modules[2].speed.value();
-    module_commands[2].theta = optimized_modules[2].angle.Radians().value();
-    module_commands[2].accel = (optimized_modules[2].speed.value() / total_speed) * total_acceleration;
-
-    module_commands[3].speed = optimized_modules[3].speed.value();
-    module_commands[3].theta = optimized_modules[3].angle.Radians().value();
-    module_commands[3].accel = (optimized_modules[3].speed.value() / total_speed) * total_acceleration;
+    for (size_t i = 0; i < 4; i++)
+    {
+        module_commands[i].speed = optimized_modules[i].speed.value();
+        module_commands[i].theta = optimized_modules[i].angle.Radians().value();
+        module_commands[i].accel = has_translation
+            ? (optimized_modules[i].speed.value() / total_speed) * total_acceleration
+            : 0.0;
+    }
 
     MotionSample motion_ref;
     motion_ref.pose_valid = false;
